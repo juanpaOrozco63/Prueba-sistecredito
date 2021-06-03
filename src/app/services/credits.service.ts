@@ -5,6 +5,7 @@ import {
   AngularFirestoreCollection,
 } from '@angular/fire/firestore';
 import { creditsModelComponent } from '../models/credits';
+import { creditDomain } from '../domains/credit';
 
 @Injectable({
   providedIn: 'root',
@@ -27,5 +28,9 @@ export class CreditsService {
   // Create credits
   createCredits(credit: creditsModelComponent) {
     this.credits.add({ ...credit });
+  }
+  updateCredit(key:string,credit:creditDomain):Promise<void>{
+    console.log("Entro")
+    return this.credits.doc(key).update(credit);
   }
 }

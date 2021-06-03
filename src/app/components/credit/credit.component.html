@@ -5,13 +5,13 @@
         </div>
     </h5>
     <div class="card-body">
-        <div class="container">
+        <div class="container-fluid">
             <h1 class="mb-4 text-center">Creditos</h1>
             <div class="input-group mb-3 ">
                 <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="searchCredit()">Buscar</button>
                 </div>
-                <input type="text" class="form-control col-auto" placeholder="Buscar por correo" aria-label="Example text with button addon" aria-describedby="button-addon1" [(ngModel)]="search">
+                <input type="text" class="form-control col-auto" (keyup.enter)="searchCredit()" placeholder="Buscar por correo" aria-label="Example text with button addon" aria-describedby="button-addon1" [(ngModel)]="search">
             </div>
             <div class="alert alert-danger" role="alert" *ngIf="validate">
                 No existen registros con ese correo electronico
@@ -29,6 +29,7 @@
                         <th scope="col">Ubicación</th>
                         <th scope="col">Valor</th>
                         <th scope="col">Cuotas</th>
+                        <th scope="col">Actualizar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,7 +44,11 @@
                         <td>{{ credit.city}}, {{ credit.neighborhood}}</td>
                         <td>{{ credit.value | currency:"COP "}}</td>
                         <td>{{ credit.dues}}</td>
-
+                        <td>
+                            <button class="btn btn-dark btn-editar" (click)="openCentrado(updateCredit, credit)">
+                                <i class="fas fa-user-edit"></i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -51,7 +56,7 @@
 
             <div class="form-group d-flex flex-row-reverse ">
                 <div class="p-2">
-                    <button class="btn btn-secondary" (click)="modal.open(createCredit)">Nuevo credito</button>
+                    <button class="btn btn-dark" (click)="modal.open(createCredit); clean()">Nuevo credito</button>
                 </div>
 
             </div>
@@ -96,7 +101,7 @@
                     <label for="inputIdentificationType">Tipo de identificación</label>
                     <select class="form-control" #inputIdentificationType id="inputIdentificationType" name="inputIdentificationType" [class.is-invalid]="inputIdentificationTypeInvalid" formControlName="inputIdentificationType">
                         <option [ngValue]="null" [disabled]="true">Seleccione una tipo de identificación</option>                             
-                        <option value="1">1</option>
+                        <option *ngFor="let idtype of arrIdentificationType" [value]="idtype">{{idtype}}</option>
                     </select>
                     <div class="text-left">
                         <small *ngIf="inputIdentificationTypeInvalid" class="text-danger ">Seleccione un tipo de identificación</small>
@@ -127,7 +132,7 @@
                     <label for="inputCity">Ciudad</label>
                     <select class="form-control" id="inputCity" #inputCity name="inputCity" [class.is-invalid]="inputCityInvalid" formControlName="inputCity">
                         <option [ngValue]="null" [disabled]="true">Seleccione una ciudad</option>                             
-                        <option value="2">2</option>
+                        <option *ngFor="let city of cities" [value]="city.city">{{city.city}}</option>
                     </select>
                     <div class="text-left">
                         <small *ngIf="inputCityInvalid" class="text-danger ">Seleccione una ciudad</small>
@@ -135,12 +140,9 @@
                 </div>
                 <div class="form-group col-6">
                     <label for="inputNeighborhood">Barrio</label>
-                    <select class="form-control" #inputNeighborhood id="inputNeighborhood" name="inputNeighborhood" [class.is-invalid]="inputNeighborhoodInvalid" formControlName="inputNeighborhood">
-                        <option [ngValue]="null" [disabled]="true">Seleccione un barrio</option>                             
-                        <option value="3">3</option>
-                    </select>
+                    <input type="text" class="form-control" #inputNeighborhood id="inputNeighborhood" name="inputNeighborhood" [class.is-invalid]="inputNeighborhoodInvalid" formControlName="inputNeighborhood" />
                     <div class="text-left">
-                        <small *ngIf="inputNeighborhoodInvalid" class="text-danger ">Seleccione un barrio</small>
+                        <small *ngIf="inputNeighborhoodInvalid" class="text-danger ">Ingrese un barrio</small>
                     </div>
                 </div>
                 <div class="form-group col-6">
@@ -158,14 +160,97 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-block btn-success ">
+            <button type="submit" class="btn btn-block btn-primary ">
                 Agregar
               </button>
         </form>
     </div>
     <div class="modal-footer">
 
-        <button type="button" class="btn btn-danger btn-block" (click)="modal.close() ;clean()">
+        <button type="button" class="btn btn-danger btn-block" (click)="modal.close()">
+      Cancelar
+    </button>
+    </div>
+</ng-template>
+<ng-template #updateCredit let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Editar credito</h4>
+        <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <form autocomplete="off">
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="inputNameUpdate">Nombres</label>
+                    <input type="text" class="form-control" id="inputNameUpdate" name="inputNameUpdate" [(ngModel)]="creditModal.name" />
+                    <div class="text-left">
+                        <small *ngIf="inputNameInvalid" class="text-danger ">Ingrese un nombre</small>
+                    </div>
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputLastNameUpdate">Apellidos</label>
+                    <input type="text" class="form-control" id="inputLastNameUpdate" name="inputLastNameUpdate" [(ngModel)]="creditModal.lastName" />
+
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputEmailUpdate">Email</label>
+                    <input type="email" class="form-control" disabled id="inputEmailUpdate" name="inputEmailUpdate" [(ngModel)]="creditModal.email" />
+
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputIdentificationTypeUpdate">Tipo de identificación</label>
+                    <select class="form-control" id="inputIdentificationTypeUpdate" name="inputIdentificationTypeUpdate" [(ngModel)]="creditModal.identificationType">
+                        <option [ngValue]="null" [disabled]="true">Seleccione una tipo de identificación</option>                             
+                        <option *ngFor="let idtype of arrIdentificationType" [value]="idtype">{{idtype}}</option>
+                    </select>
+
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputIDUpdate">Número de identificación</label>
+                    <input type="text" class="form-control" id="inputIDUpdate" name="inputIDUpdate" [(ngModel)]="creditModal.id" />
+
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputAddressUpdate">Dirección</label>
+                    <input type="text" class="form-control" id="inputAddressUpdate" name="inputAddressUpdate" [(ngModel)]="creditModal.address" />
+
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputPhoneUpdate">Teléfono</label>
+                    <input type="text" class="form-control" id="inputPhoneUpdate" name="inputPhoneUpdate" [(ngModel)]="creditModal.phone" />
+
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputCityUpdate">Ciudad</label>
+                    <select class="form-control" id="inputCityUpdate" name="inputCityUpdate" [(ngModel)]="creditModal.city">
+                        <option [ngValue]="null" [disabled]="true">Seleccione una ciudad</option>                             
+                        <option *ngFor="let city of cities" [value]="city.city">{{city.city}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputNeighborhoodUpdate">Barrio</label>
+                    <input type="text" class="form-control" id="inputNeighborhoodUpdate" name="inputNeighborhoodUpdate" [(ngModel)]="creditModal.neighborhood" />
+
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputValueUpdate">Valor total</label>
+                    <input type="number" class="form-control" id="inputValueUpdate" name="inputValueUpdate" [(ngModel)]="creditModal.value" />
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputDuesUpdate">Número de cuotas</label>
+                    <input type="number" class="form-control" id="inputDuesUpdate" name="inputDuesUpdate" [(ngModel)]="creditModal.dues" />
+                </div>
+            </div>
+            <button type="button" class="btn btn-block btn-primary " (click)="editModalCredit()">
+                Editar
+              </button>
+        </form>
+    </div>
+    <div class="modal-footer">
+
+        <button type="button" class="btn btn-danger btn-block" (click)="modal.close()">
       Cancelar
     </button>
     </div>

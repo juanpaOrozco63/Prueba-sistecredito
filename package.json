@@ -27,6 +27,7 @@
     "ngb-modal": "^2.0.3",
     "ngx-pagination": "^5.1.0",
     "rxjs": "~6.6.0",
+    "sweetalert": "^2.1.2",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"
   },

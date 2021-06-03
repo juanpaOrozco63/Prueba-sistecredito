@@ -5,6 +5,8 @@ import { CreditsService } from '../../services/credits.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { creditDomain } from '../../domains/credit';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert';
 
 @Component({
   selector: 'app-credit',
@@ -18,11 +20,15 @@ export class CreditComponent implements OnInit {
   credit : creditDomain
   search:string ='';
   validate:boolean=false;
+  cities:any={}
+  arrIdentificationType:string[]=['Cédula','Pasaporte','Tarjeta de identidad','Otro']
+  creditModal:creditDomain;
   constructor(
     private db: AngularFirestore,
     private creditService: CreditsService,
     public modal: NgbModal,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private http:HttpClient 
   ) {
     this.createForm();
     this.loadFormData();
@@ -30,6 +36,7 @@ export class CreditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getCities();
     this.getAllCredits();
     this.credit = new creditDomain(
       null,
@@ -45,6 +52,12 @@ export class CreditComponent implements OnInit {
       null,
     );
   }
+  getCities(){
+    return this.http.get("../../assets/ciudades.json").subscribe(resp=>{
+      this.cities=resp
+    })
+  }
+
   getAllCredits(): void {
     this.db
       .collection('creditos')
@@ -58,7 +71,12 @@ export class CreditComponent implements OnInit {
     inputPhone,inputCity,inputNeighborhood,
     inputValue,inputDues): void {
       
-      if(this.formCreateCredit.invalid){          
+      if(this.formCreateCredit.invalid){    
+        Swal({
+          icon: 'error',
+          title: 'Error',
+          text: 'Complete todos los datos',
+        });      
         return Object.values(this.formCreateCredit.controls).forEach(control =>{
           control.markAsTouched();
         })
@@ -73,8 +91,14 @@ export class CreditComponent implements OnInit {
         this.credit.city=inputCity;
         this.credit.neighborhood=inputNeighborhood;
         this.credit.value=inputValue;
-        this.credit.dues=inputDues;
-        this.creditService.createCredits(this.credit)    
+        this.credit.dues=inputDues;       
+        this.creditService.createCredits(this.credit)   
+        Swal({
+          icon: 'success',
+          title: 'Completado',
+          text: 'Se ha completado su registro correctamente',
+        }); 
+        this.modal.dismissAll()      
       }
   
   }
@@ -215,7 +239,35 @@ export class CreditComponent implements OnInit {
       this.validate=true;
       this.getAllCredits();
     }
+    if(!found && this.search===''){
+      this.validate=false;
+      this.getAllCredits()
+    }
     
     
+  }
+  //Abri el modal centrado
+  openCentrado(contain, credit: creditDomain) {
+    this.creditModal = credit;   
+    //Abrir modal
+    this.modal.open(contain, { centered: true });
+  }
+  editModalCredit(){
+    let emailData;
+    this.creditService.getCreditsList().get().subscribe(resp=>{
+      resp.docs.forEach(data=>{
+        const valueCredit= data.data();
+         emailData = valueCredit.email;
+        if(emailData===this.creditModal.email)
+        this.creditService.updateCredit(data.id,this.creditModal)        
+
+      })
+      Swal({
+        icon: 'success',
+        title: 'Se actualizo correctamente',
+        text: `El credito de ${emailData} fue actualizado correctamente`,
+      }); 
+      this.modal.dismissAll()     
+    })
   }
 }
