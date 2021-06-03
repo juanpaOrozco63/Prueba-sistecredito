@@ -5,7 +5,8 @@ export class creditsModelComponent {
    id:string;
    identificationType:string;
    lastName:string;
-   location:string[];
+   city:string;
+   neighborhood:string;
    name:string;
    phone:string;
    value:number;

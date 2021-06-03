@@ -10,7 +10,7 @@ import { creditsModelComponent } from '../models/credits';
   providedIn: 'root',
 })
 export class CreditsService {
-  dbPath = '/credits';
+  dbPath = '/creditos';
   credits: AngularFirestoreCollection<creditsModelComponent> = null;
 
   constructor(private db: AngularFirestore) {
@@ -25,7 +25,7 @@ export class CreditsService {
     return this.credits.doc(key).delete();
   }
   // Create credits
-  createUsuarios(credit: creditsModelComponent) {
+  createCredits(credit: creditsModelComponent) {
     this.credits.add({ ...credit });
   }
 }
