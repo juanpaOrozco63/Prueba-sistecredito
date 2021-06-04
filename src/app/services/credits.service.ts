@@ -30,7 +30,6 @@ export class CreditsService {
     this.credits.add({ ...credit });
   }
   updateCredit(key:string,credit:creditDomain):Promise<void>{
-    console.log("Entro")
     return this.credits.doc(key).update(credit);
   }
 }

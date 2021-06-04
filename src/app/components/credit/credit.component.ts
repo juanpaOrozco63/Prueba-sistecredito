@@ -226,22 +226,26 @@ export class CreditComponent implements OnInit {
   }
   searchCredit(){
     let found:boolean= false;
+    let newCredits:creditDomain[] = new Array<any>()
     this.credits.forEach(credit=>{
-      if(credit.email===this.search){
-        this.credits = []
-        this.credits.push(credit)
+      if((credit.email===this.search)|| (credit.id==this.search)||
+      (credit.identificationType==this.search)){
+        newCredits.push(credit)
         found=true;
         this.validate=false;
 
       }
-    })
+    }
+    )
+    this.credits=newCredits
     if(!found){
       this.validate=true;
       this.getAllCredits();
-    }
-    if(!found && this.search===''){
+    }else if(!found && this.search===''){
       this.validate=false;
       this.getAllCredits()
+    }else if(!Boolean(this.search)){
+      this.validate=false;
     }
     
     

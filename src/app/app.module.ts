@@ -13,7 +13,6 @@ import { AngularFirestore } from '@angular/fire/firestore';
 // Http
 import { HttpClientModule } from '@angular/common/http';
 import { CreditComponent } from './components/credit/credit.component';
-import { FooterComponent } from './components/shared/footer/footer.component';
 // NGx
 import {NgxPaginationModule} from 'ngx-pagination';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -25,7 +24,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   declarations: [
     AppComponent,
     CreditComponent,
-    FooterComponent
   ],
   imports: [
     BrowserModule,
